@@ -1,5 +1,6 @@
 import json
 from queue import PriorityQueue
+import heapq as heap
 import math
 import time
 import utils
@@ -34,7 +35,39 @@ with open('G.json', 'r') as data:
 with open('Coord.json', 'r') as data:
     coord = json.load(data)
 
+def UCS(G, startingNode, endingNode, Dist):
+        parents = {}
+        visited = set()
+        distance = defaultdict(lambda: float('inf'))
+        pq = []
+        # priority queue
+        heap.heappush(pq, (0, startingNode))
+        distance[startingNode] = 0
 
+        # while priority queue not empty
+        while pq:
+            _, curr = heap.heappop(pq)
+
+            if curr == endingNode:
+                break
+
+            adjacent_nodes = G[curr]
+
+            for nodes in adjacent_nodes:
+                # if nodes in visited: continue
+                if nodes in visited:
+                    continue
+
+                cost = float(distance[curr] + float(Dist[curr + ',' + nodes]))
+
+                if distance[nodes] > cost:
+                    parents[nodes] = curr
+                    distance[nodes] = cost
+                    heap.heappush(pq, (cost, nodes))
+
+            visited.add(curr)
+
+        return parents, distance
 
 print (" ============================ TASK 1 =======================================")
 def uniform_cost_search(graph, start, goal):
@@ -147,6 +180,7 @@ def a_star_search(graph, start, goal):
     return None, None
 
 st = time.perf_counter()
+
 a_star_search(graph, start, goal)
 end = time.perf_counter()
 print("Time taken: " , (end-st))
