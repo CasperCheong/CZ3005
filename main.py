@@ -15,7 +15,6 @@ logging.basicConfig(filename = "logfile5.log",
                     filemode = "w",
                     format = Log_Format, 
                     level = logging.DEBUG)
-
 logger = logging.getLogger()
 
 
@@ -34,7 +33,7 @@ with open("Coord.json") as coordData:
 with open ("Cost.json") as costData:
     Cost = json.load(costData)
 
-
+#Helper Class
 class Helpers:
     def path_from_parents(self,parentDict, startNode, endNode):
         currentNode = endNode
@@ -49,7 +48,7 @@ class Helpers:
 
         return path
 
-    def print_path(self,path):
+    def print_path(self,path): #Print sorted path
         solution_str = "Shortest path: {}" .format(path[0])
         for i in range(1,len(path)):
             if path[i] is string :
@@ -66,7 +65,7 @@ class Helpers:
         print("Total Energy Cost:",totalEnergy)
         
 
-    def calculateDistance(self,path,dist):
+    def calculateDistance(self,path,dist): #calculate PathCost
         totalDistance = 0
         for i in range(1,(len(path))):
              if path[i] is string :
@@ -75,7 +74,7 @@ class Helpers:
                 totalDistance += dist[str(path[i-1])+","+str(path[i])]
         return totalDistance
 
-    def calculateEnergyCost(self,path, cost):
+    def calculateEnergyCost(self,path, cost): #Energy Cost
             totalEnergy = 0
             for i in range(1, (len(path))):
                 if path[i] is string :
@@ -84,7 +83,7 @@ class Helpers:
                     totalEnergy += cost[str(path[i - 1]) + "," + str(path[i])]
             return totalEnergy
 
-    def calculateHeuristicDistance(self,current,end,coord): #cuurent end input wiht int
+    def calculateHeuristicDistance(self,current,end,coord): 
         current_coord = coord[str(current)]
         end_coord = coord[str(end)]
         return math.dist(current_coord,end_coord)
@@ -194,9 +193,8 @@ class Solution :
    
 
 
-#Setting Parameter
-start = "1"
-end = "50"
+#Init
+
 budget = 287932
 Sol= Solution()
 helper = Helpers()
@@ -209,13 +207,18 @@ end = time.perf_counter()
 path = helper.path_from_parents(pr,"1","50")
 helper.print_results(path,Cost,Dist)
 print("Time taken: " , (end-st))
+
+
+
 print (" ============================ TASK 2  UCS Without Constraint =======================================")
 st = time.perf_counter()
 pr = Sol.UCSWithConstraint(G,"1","50",Cost,Dist,budget)
 helper.print_results(pr,Cost,Dist)
 end = time.perf_counter()
-
 print("Time taken: " , (end-st))
+
+
+
 print (" ============================ TASK 3  A* Search W Budget =======================================")
 st = time.perf_counter()
 pr = Sol.aStarSearch(G,"1","50",Dist,Cost,Coord,budget)
