@@ -4,6 +4,7 @@ from collections import defaultdict
 import heapq as heap
 import math
 from re import I
+import string
 import time
 import utils
 import logging
@@ -19,10 +20,6 @@ logging.basicConfig(filename = "logfile5.log",
 
 logger = logging.getLogger()
 
-#Setting Parameter
-start = 1
-goal = 50
-budget = 287932
 
 #Load Files
 with open("G.json") as gData:
@@ -57,16 +54,16 @@ class Helpers:
     def print_path(self,path):
         solution_str = "Shortest path: {}" .format(path[0])
         for i in range(1,len(path)):
-            solution_str = solution_str + "->" + path[i]
+            if path[i] is string :
+                solution_str = solution_str + "->" + path[i]
+            else :
+                solution_str = solution_str + "->" + str(path[i])
         print (solution_str)
     
     def print_results(self,path,cost,dist):
         totalDistance = self.calculateDistance(path,dist)
         totalEnergy = self.calculateEnergyCost(path,cost)
-        solution_str = "Shortest path: {}" .format(path[0])
-        for i in range(1,len(path)):
-            solution_str = solution_str + "->" + path[i]
-        print (solution_str)
+        self.print_path(path)
         print("Shortest Distance:", totalDistance)
         print("Total Energy Cost:",totalEnergy)
         
@@ -74,14 +71,25 @@ class Helpers:
     def calculateDistance(self,path,dist):
         totalDistance = 0
         for i in range(1,(len(path))):
-            totalDistance += dist[path[i-1]+","+path[i]]
+             if path[i] is string :
+                totalDistance += dist[path[i-1]+","+path[i]]
+             else:
+                totalDistance += dist[str(path[i-1])+","+str(path[i])]
         return totalDistance
 
     def calculateEnergyCost(self,path, cost):
             totalEnergy = 0
             for i in range(1, (len(path))):
-                totalEnergy += cost[path[i - 1] + "," + path[i]]
+                if path[i] is string :
+                    totalEnergy += cost[path[i - 1] + "," + path[i]]
+                else :
+                    totalEnergy += cost[str(path[i - 1]) + "," + str(path[i])]
             return totalEnergy
+
+    def calculateHeuristicDistance(self,current,end,coord): #cuurent end input wiht int
+        current_coord = coord[str(current)]
+        end_coord = coord[str(end)]
+        return math.dist(current_coord,end_coord)
 
 
 class Solution :
@@ -126,7 +134,7 @@ class Solution :
         visited = set()
         priorityQ = []
         
-        heap.heappush(priorityQ,(0,(0,[str(startingNode)]))) #((Distance, (EnergyCost,Array of path))
+        heap.heappush(priorityQ,(0,(0,[startingNode]))) #((Distance, (EnergyCost,Array of path))
         
         while priorityQ:
             
@@ -155,144 +163,66 @@ class Solution :
                             newNodeArr.append(neighbour)
                             heap.heappush(priorityQ,(newDistance,(newEnergyCost,newNodeArr)))
 
+    def aStarSearch (self,G,startingNode,endingNode , dist,cost,coord,budget):
+    
+        priorityQ = PriorityQueue()
+        priorityQ.put((0,startingNode,0))
+
+        parentDict = {}
+        distanceDict = {}
+
+        parentDict[startingNode] = None
+        distanceDict[startingNode] = 0
+
+        while not priorityQ.empty():
+            _ , currentNode, currentEnergy = priorityQ.get()
+           
+            if currentNode == endingNode:
+                return parentDict
+
+            else:
+                for neighbours in G[currentNode]:
+                    currNeighbourStr = currentNode+","+str(neighbours)
+                    newDist = distanceDict[currentNode] + float(dist[currNeighbourStr])
+                    newEnergy = currentEnergy + float(cost[currNeighbourStr])
+                    if neighbours not in distanceDict or newDist < distanceDict[neighbours]:
+                        if newEnergy < budget:
+                            distanceDict[neighbours] = newDist
+                            f_function = newDist + Helpers().calculateHeuristicDistance(neighbours,endingNode,coord)
+                            priorityQ.put((f_function, neighbours,newEnergy))
+                            parentDict[neighbours] = currentNode
+        return None, None
+
+   
 
 
+#Setting Parameter
+start = "1"
+end = "50"
+budget = 287932
+Sol= Solution()
+helper = Helpers()
 
 
-
-x= Solution()
-y = Helpers()
-
-print (" ============================ TASK 1 =======================================")
+print (" ============================ TASK 1 UCS Without Constraint =======================================")
 st = time.perf_counter()
-pr  =x.UCSWithoutConstraint(G,"1","50",Dist)
+pr  =Sol.UCSWithoutConstraint(G,"1","50",Dist)
 end = time.perf_counter()
-path = y.path_from_parents(pr,"1","50")
-y.print_results(path,Cost,Dist)
+path = helper.path_from_parents(pr,"1","50")
+helper.print_results(path,Cost,Dist)
 print("Time taken: " , (end-st))
-print (" ============================ TASK 2 =======================================")
+print (" ============================ TASK 2  UCS Without Constraint =======================================")
 st = time.perf_counter()
-pr = x.UCSWithConstraint(G,"1","50",Cost,Dist,budget)
-y.print_results(pr,Cost,Dist)
+pr = Sol.UCSWithConstraint(G,"1","50",Cost,Dist,budget)
+helper.print_results(pr,Cost,Dist)
 end = time.perf_counter()
 
 print("Time taken: " , (end-st))
-
-# print (" ============================ TASK 1 =======================================")
-# def uniform_cost_search(graph, start, goal,dist):
-#     visited=set()
-#     queue = PriorityQueue()
-#     queue.put((0, [start])) #((Distance, (Cost,Node[]))
-
-    
-#     while queue:
-        
-#         # logger.debug(queue.queue)
-#         distance, node = queue.get()
-#         # print(node)
-#         cur_node = int(node[-1]) #Check cur_node as its always at the end
-
-#         if cur_node == goal: 
-#             #Perform print 
-#             Solution = Helpers()
-#             Solution.print_path(node)
-#             # utils.print_path(node)
-#             print("Shortest distance: " + str(distance))
-#             return distance, node
-#         if cur_node not in visited:
-#             visited.add(cur_node)
-#             for i in graph[str(cur_node)]:
-#                 if i not in visited:
-#                     temp= str(cur_node)+","+str(i)
-#                     new_distance = distance + dist[temp] 
-#                     node_path = node.copy()
-#                     node_path.append(i)
-#                     queue.put((new_distance,node_path))
-
-# st = time.perf_counter()
-# uniform_cost_search(G, start, goal,Dist)
-# end = time.perf_counter()
-# print("Time taken: " , (end-st))
-
-# print ("\n ============================ TASK 2 =======================================")
-# def uniform_cost_search_constrained(g, start, goal, budget,cost,dist):
-#     visited=set()
-#     queue = PriorityQueue()
-#     queue.put((0, (0,[str(start)]))) #((Distance, (Cost,Node[]))
-    
-#     while queue:
-#         distance, energy_node = queue.get()
-#         energy = energy_node[0]
-#         node = energy_node[1]
-#         cur_node = int(node[-1]) #Check cur_node as its always at the end
-#         if cur_node == goal: 
-#             #Perform print 
-#             utils.print_path(node)
-#             print("Shortest distance: " + str(distance))
-#             print("Total energy cost: "+ str(energy))
-#             return distance, energy, node
-#         if cur_node not in visited:
-#             visited.add(cur_node)
-#             for i in g[str(cur_node)]:
-#                 if i not in visited:
-#                     temp= str(cur_node)+","+str(i)
-#                     new_energy = energy + cost[temp]
-#                     if new_energy < budget:
-#                         new_distance = distance + dist[temp] 
-#                         node_path = node.copy()
-#                         node_path.append(i)
-#                         queue.put((new_distance,(new_energy,node_path)))
-
-# st = time.perf_counter()
-# uniform_cost_search_constrained(G, start, goal, budget,Cost,Dist)
-# end = time.perf_counter()
-# print("Time taken: " , (end-st))
-
-# print (" \n ============================ TASK 3 =======================================")
-# def heuristic(nodeA, nodeB,coord):
-#     (xA, yA) = coord[str(nodeA)]
-#     (xB, yB) = coord[str(nodeB)]
-#     distance = math.sqrt((xA - xB)**2 + (yA - yB)**2)
-#     return distance
-
-# def a_star_search(graph, start, goal,dist,cost,coord):
-#     pq = PriorityQueue()
-#     pq.put((0, start, 0)) # initial dist, start node, initial energy
-    
-#     path = {} # Child: Parent
-
-#     distance_travelled = {} # : Node: Cost
-
-#     path[start] = None
-#     distance_travelled[start] = 0
-    
-#     while not pq.empty():
-#         current_dist, current_node, current_energy = pq.get()
-#         # print(current_cost, current_node, current_energy)
-        
-#         if int(current_node) == goal:
-#             # print("Found")
-#             path = utils.reconstruct_path(path, start, goal)
-#             utils.print_path(path)
-#             print("Shortest distance: ", current_dist)
-#             print("Total energy cost: ", current_energy)
-#             # print(came_from)
-#             return path, current_dist, current_energy
-#         else: 
-#             for next in graph[str(current_node)]:
-#                 new_dist = distance_travelled[current_node] + float(dist[str(current_node)+","+str(next)])
-#                 new_energy = current_energy + float(cost[str(current_node)+","+str(next)])
-#                 if next not in distance_travelled or new_dist < distance_travelled[next]:
-#                     if new_energy < budget:
-#                         distance_travelled[next] = new_dist
-#                         priority = new_dist + heuristic(next, goal,coord)
-#                         pq.put((priority, next, new_energy))
-#                         path[next] = current_node
-#     return None, None
-
-# st = time.perf_counter()
-
-# a_star_search(G, start, goal,Dist,Cost,Coord)
-# end = time.perf_counter()
-# print("Time taken: " , (end-st))
+print (" ============================ TASK 3  A* Search W Budget =======================================")
+st = time.perf_counter()
+pr = Sol.aStarSearch(G,"1","50",Dist,Cost,Coord,budget)
+path = helper.path_from_parents(pr,"1","50")
+helper.print_results(path,Cost,Dist)
+end = time.perf_counter()
+print("Time taken: " , (end-st))
 
