@@ -3,15 +3,13 @@ from queue import PriorityQueue
 from collections import defaultdict
 import heapq as heap
 import math
-from re import I
 import string
 import time
-import utils
 import logging
 
 #DEBUG LOGs
 
-Log_Format = "%(levelname)s %(asctime)s - %(message)s"
+Log_Format = "%(message)s"
 
 logging.basicConfig(filename = "logfile5.log",
                     filemode = "w",
