@@ -9,13 +9,13 @@ import logging
 
 #DEBUG LOGs
 
-Log_Format = "%(message)s"
+# Log_Format = "%(message)s"
 
-logging.basicConfig(filename = "logfile5.log",
-                    filemode = "w",
-                    format = Log_Format, 
-                    level = logging.DEBUG)
-logger = logging.getLogger()
+# logging.basicConfig(filename = "logfile5.log",
+#                     filemode = "w",
+#                     format = Log_Format, 
+#                     level = logging.DEBUG)
+# logger = logging.getLogger()
 
 
 #Load Files
