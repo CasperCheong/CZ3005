@@ -50,7 +50,7 @@ class Helpers:
         return path
 
     # Print Path
-    def print_path(self,path): #Print sorted path
+    def print_path(self,path): 
         solution_str = "Shortest path: {}" .format(path[0])
         for i in range(1,len(path)):
             if path[i] is string :
@@ -68,7 +68,7 @@ class Helpers:
         print("Total Energy Cost:",totalEnergy)
         
     # Calculate total distance of the path
-    def calculateDistance(self,path,dist): #calculate PathCost
+    def calculateDistance(self,path,dist): 
         totalDistance = 0
         for i in range(1,(len(path))):
              if path[i] is string :
@@ -78,7 +78,7 @@ class Helpers:
         return totalDistance
 
     # Calculate total energy cost of the path
-    def calculateEnergyCost(self,path, cost): #Energy Cost
+    def calculateEnergyCost(self,path, cost): 
             totalEnergy = 0
             for i in range(1, (len(path))):
                 if path[i] is string :
@@ -129,7 +129,7 @@ class Solution :
                     pathCost = float(distance[current_node] + float(dist[current_node + ',' + neighbour]))
 
                     # If distance of current neighbour node is less than current distance, update distance
-                    if distance[neighbour] > pathCost:  #if new Path is shorter than current shortest path update
+                    if distance[neighbour] > pathCost: 
                         parentDict[neighbour] = current_node
                         distance[neighbour] = pathCost
                         heappush(min_heap, (pathCost, neighbour))
@@ -260,7 +260,7 @@ print("Time taken: " , (end-st))
 
 
 
-print (" ============================ TASK 2  UCS Without Constraint =======================================")
+print (" ============================ TASK 2  UCS With Constraint =======================================")
 st = time.perf_counter()
 pr = Sol.UCSWithConstraint(G,"1","50",Cost,Dist,budget)
 helper.print_results(pr,Cost,Dist)
