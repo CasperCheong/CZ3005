@@ -251,29 +251,29 @@ helper = Helpers()
 
 
 print (" ============================ TASK 1 UCS Without Constraint =======================================")
-st = time.perf_counter()
+start = time.perf_counter()
 pr  =Sol.UCSWithoutConstraint(G,"1","50",Dist)
 end = time.perf_counter()
 path = helper.path_from_parents(pr,"1","50")
 helper.print_results(path,Cost,Dist)
-print("Time taken: " , (end-st))
+print("Time taken: " , (end-start))
 
 
 
 print (" ============================ TASK 2  UCS With Constraint =======================================")
-st = time.perf_counter()
+start = time.perf_counter()
 pr = Sol.UCSWithConstraint(G,"1","50",Cost,Dist,budget)
 helper.print_results(pr,Cost,Dist)
 end = time.perf_counter()
-print("Time taken: " , (end-st))
+print("Time taken: " , (end-start))
 
 
 
 print (" ============================ TASK 3  A* Search W Budget =======================================")
-st = time.perf_counter()
+start = time.perf_counter()
 pr = Sol.aStarSearch(G,"1","50",Dist,Cost,Coord,budget)
 path = helper.path_from_parents(pr,"1","50")
 helper.print_results(path,Cost,Dist)
 end = time.perf_counter()
-print("Time taken: " , (end-st))
+print("Time taken: " , (end-start))
 
