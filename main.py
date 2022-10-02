@@ -1,7 +1,7 @@
 import json
 from queue import PriorityQueue
 from collections import defaultdict
-from heapq import heappush, heappop
+from heapq import heapify, heappush, heappop
 import math
 import string
 import time
@@ -96,11 +96,11 @@ class Helpers:
 class Solution :
     def UCSWithoutConstraint(self,G, startingNode, endingNode, dist):
             visited = set()
-            parentDict = {}  #use Dictionary to track parents
-            distance = defaultdict(lambda: float('inf')) #keeps track of shortest distance to nodes
+            parentDict = {}  # Dictionary to track parents
+            distance = defaultdict(lambda: float('inf')) # Keeps track of shortest distance to nodes
          
             min_heap = []
-
+            
             # Add starting node to min heap
             heappush(min_heap, (0, startingNode))
 
@@ -128,8 +128,9 @@ class Solution :
                     # Calculate distance of neighbour node
                     pathCost = float(distance[current_node] + float(dist[current_node + ',' + neighbour]))
 
-                    # If distance of current neighbour node is less than current distance, update distance
-                    if distance[neighbour] > pathCost:  #if new Path is shorter than current shortest path update
+                    # If new path cost of current neighbour node is less than current distance of neighbour node, 
+                    # Update distance, parent and add to min heap
+                    if distance[neighbour] > pathCost: 
                         parentDict[neighbour] = current_node
                         distance[neighbour] = pathCost
                         heappush(min_heap, (pathCost, neighbour))
@@ -145,8 +146,12 @@ class Solution :
         min_heap = []
         
         # Same as what we did in UCSWithoutConstraint, put the starting node in the min heap, with distance 0 and energy cost 0
-        heappush(min_heap,(0,(0,[startingNode]))) #((Distance, (EnergyCost,Array of path))
-        
+        #((Distance, (EnergyCost,Array of path))
+        heappush(min_heap,(0,(0,[startingNode]))) 
+
+        # Keeps track of shortest distance to nodes
+        pathDistance = defaultdict(lambda: float('inf'))
+        pathDistance[startingNode] = 0
         # While min heap is not empty
         while min_heap:
             
@@ -168,7 +173,7 @@ class Solution :
                 return nodeArr
             
             # If current node is not in the visited set
-            if current_node not in visited :
+            if current_node not in visited:
                 visited.add(current_node)
                 
                 # Initialise neighbours of current node
@@ -176,20 +181,25 @@ class Solution :
                     # If neighbour node has been visited, we do not add it to our path
                     if neighbour in visited:
                         continue
-                    #if neighbour not in visited:
 
                     path_str = str(current_node)+ ","+ str(neighbour)
 
                     # Calculate total energy cost of the current path
                     newEnergyCost = energyCost + cost[path_str]
 
-                    # If current total energy cost is less than the budget, we add the neighbour node to the newNodeArr 
-                    # and push the current path into the min heap
-                    if newEnergyCost < budget :
-                        newDistance = distance + dist[path_str]
-                        newNodeArr = nodeArr.copy()
-                        newNodeArr.append(neighbour)
-                        heappush(min_heap,(newDistance,(newEnergyCost,newNodeArr)))
+                    # Calculate total distance of the current path
+                    newDistance = distance + dist[path_str]
+
+                    # If current total energy cost is less than the budget,  
+                    
+                    if newEnergyCost < budget:
+                        # If new path cost of current neighbour node is less than current distance of neighbour node,
+                        # add the neighbour node to the newNodeArr and push the current path into the min heap
+                        if pathDistance[neighbour] > newDistance:
+                            pathDistance[neighbour] = newDistance
+                            newNodeArr = nodeArr.copy()
+                            newNodeArr.append(neighbour)
+                            heappush(min_heap,(newDistance,(newEnergyCost,newNodeArr)))
 
     def aStarSearch (self,G,startingNode,endingNode,dist,cost,coord,budget):
         
@@ -256,16 +266,16 @@ pr  =Sol.UCSWithoutConstraint(G,"1","50",Dist)
 end = time.perf_counter()
 path = helper.path_from_parents(pr,"1","50")
 helper.print_results(path,Cost,Dist)
-print("Time taken: " , (end-st))
+print("Time Taken: " , (end-st))
 
 
 
-print (" ============================ TASK 2  UCS Without Constraint =======================================")
+print (" ============================ TASK 2  UCS With Constraint =======================================")
 st = time.perf_counter()
 pr = Sol.UCSWithConstraint(G,"1","50",Cost,Dist,budget)
 helper.print_results(pr,Cost,Dist)
 end = time.perf_counter()
-print("Time taken: " , (end-st))
+print("Time Taken: " , (end-st))
 
 
 
@@ -275,5 +285,5 @@ pr = Sol.aStarSearch(G,"1","50",Dist,Cost,Coord,budget)
 path = helper.path_from_parents(pr,"1","50")
 helper.print_results(path,Cost,Dist)
 end = time.perf_counter()
-print("Time taken: " , (end-st))
+print("Time Taken: " , (end-st))
 
