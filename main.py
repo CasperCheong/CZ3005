@@ -96,8 +96,8 @@ class Helpers:
 class Solution :
     def UCSWithoutConstraint(self,G, startingNode, endingNode, dist):
             visited = set()
-            parentDict = {}  # Dictionary to track parents
-            distance = defaultdict(lambda: float('inf')) # Keeps track of shortest distance to nodes
+            parent = {}  # Dictionary to track parents
+            pathCost = defaultdict(lambda: float('inf')) # Keeps track of shortest distance to nodes
          
             min_heap = []
             
@@ -105,7 +105,7 @@ class Solution :
             heappush(min_heap, (0, startingNode))
 
             # Set distance of starting node to 0
-            distance[startingNode] = 0
+            pathCost[startingNode] = 0
             
             # While min heap is not empty
             while min_heap:
@@ -126,19 +126,19 @@ class Solution :
                         continue
                     
                     # Calculate distance of neighbour node
-                    pathCost = float(distance[current_node] + float(dist[current_node + ',' + neighbour]))
+                    newPathCost = float(pathCost[current_node] + float(dist[current_node + ',' + neighbour]))
 
                     # If new path cost of current neighbour node is less than current distance of neighbour node, 
                     # Update distance, parent and add to min heap
-                    if distance[neighbour] > pathCost: 
-                        parentDict[neighbour] = current_node
-                        distance[neighbour] = pathCost
-                        heappush(min_heap, (pathCost, neighbour))
+                    if pathCost[neighbour] > newPathCost: 
+                        parent[neighbour] = current_node
+                        pathCost[neighbour] = newPathCost
+                        heappush(min_heap, (newPathCost, neighbour))
 
                 # Add current node to visited set
                 visited.add(current_node)
 
-            return parentDict
+            return parent
 
     # Need to consider the energy cost constraint
     def UCSWithConstraint(self,G,startingNode,endingNode,cost,dist,budget):
@@ -150,8 +150,9 @@ class Solution :
         heappush(min_heap,(0,(0,[startingNode]))) 
 
         # Keeps track of shortest distance to nodes
-        pathDistance = defaultdict(lambda: float('inf'))
-        pathDistance[startingNode] = 0
+        pathCost = defaultdict(lambda: float('inf'))
+        pathCost[startingNode] = 0
+
         # While min heap is not empty
         while min_heap:
             
@@ -188,18 +189,16 @@ class Solution :
                     newEnergyCost = energyCost + cost[path_str]
 
                     # Calculate total distance of the current path
-                    newDistance = distance + dist[path_str]
+                    newPathCost = distance + dist[path_str]
 
                     # If current total energy cost is less than the budget,  
-                    
-                    if newEnergyCost < budget:
+                    if newEnergyCost < budget and pathCost[neighbour] > newPathCost:
                         # If new path cost of current neighbour node is less than current distance of neighbour node,
                         # add the neighbour node to the newNodeArr and push the current path into the min heap
-                        if pathDistance[neighbour] > newDistance:
-                            pathDistance[neighbour] = newDistance
+                            pathCost[neighbour] = newPathCost
                             newNodeArr = nodeArr.copy()
                             newNodeArr.append(neighbour)
-                            heappush(min_heap,(newDistance,(newEnergyCost,newNodeArr)))
+                            heappush(min_heap,(newPathCost,(newEnergyCost,newNodeArr)))
 
     def aStarSearch (self,G,startingNode,endingNode,dist,cost,coord,budget):
         
@@ -209,14 +208,14 @@ class Solution :
 
         # Add starting node to min heap
         priorityQ.put((0,startingNode,0))
-
-        parentDict = {}
-        distanceDict = {}
+        visited = set()
+        parent = {}
+        pathCost = defaultdict(lambda: float('inf'))
 
         # Set parent of starting node to None
-        parentDict[startingNode] = None
+        parent[startingNode] = None
         # Set distance of starting node to 0
-        distanceDict[startingNode] = 0
+        pathCost[startingNode] = 0
 
         # While priority queue is not empty
         while priorityQ:
@@ -225,28 +224,29 @@ class Solution :
            
             # If current node is the ending node, return path
             if currentNode == endingNode:
-                return parentDict
+                return parent
 
-            # Initialise neighbours of current node
-            for neighbour in G[currentNode]:
-                currNeighbourStr = currentNode+","+str(neighbour)
+            # If current node is not in the visited set
+            if currentNode not in visited:
+                visited.add(currentNode)
+                # Initialise neighbours of current node
+                for neighbour in G[currentNode]:
+                    currNeighbourStr = currentNode+","+str(neighbour)
 
-                # Calculate total distance of the current path
-                newDist = distanceDict[currentNode] + float(dist[currNeighbourStr])
-                # Calculate total energy cost of the current path
-                newEnergy = currentEnergy + float(cost[currNeighbourStr])
+                    # Calculate total distance of the current path
+                    newPathCost = pathCost[currentNode] + float(dist[currNeighbourStr])
+                    # Calculate total energy cost of the current path
+                    newEnergyCost = currentEnergy + float(cost[currNeighbourStr])
 
-                # If neighbour is not visited yet or current path is shorter than previous path, 
-                # we add the neighbour node to the newNodeArr
-                if neighbour not in distanceDict or newDist < distanceDict[neighbour]:
-                    # If current total energy cost is less than the budget, we calculate the heuristic distance
-                    # of the neighbour node and push the neighbour node into the priority queue
-                    # We also update the parentDict and distanceDict
-                    if newEnergy < budget:
-                        distanceDict[neighbour] = newDist
-                        f_function = newDist + Helpers().calculateHeuristicDistance(neighbour,endingNode,coord)
-                        priorityQ.put((f_function, neighbour,newEnergy))
-                        parentDict[neighbour] = currentNode
+                    # If current total energy cost is less than the budget,
+                    # and if new path cost of current neighbour node is less than current distance of neighbour node,
+                    if pathCost[neighbour] > newPathCost and newEnergyCost < budget:
+                        # we calculate the heuristic distance of the neighbour node and push the neighbour node into the priority queue
+                        # We also update parent and pathCost
+                        pathCost[neighbour] = newPathCost
+                        f_function = newPathCost + Helpers().calculateHeuristicDistance(neighbour,endingNode,coord)
+                        priorityQ.put((f_function, neighbour,newEnergyCost))
+                        parent[neighbour] = currentNode
                     
         return None, None
 
