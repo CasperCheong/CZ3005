@@ -178,11 +178,7 @@ class Solution :
                 visited.add(current_node)
                 
                 # Initialise neighbours of current node
-                for neighbour in G[str(current_node)]:
-                    # If neighbour node has been visited, we do not add it to our path
-                    if neighbour in visited:
-                        continue
-
+                for neighbour in G[str(current_node)]:                    
                     path_str = str(current_node)+ ","+ str(neighbour)
 
                     # Calculate total energy cost of the current path
@@ -191,19 +187,20 @@ class Solution :
                     # Calculate total distance of the current path
                     newPathCost = distance + dist[path_str]
 
-                    # If current total energy cost is less than the budget,  
+                    # If current total energy cost is less than the budget,
+                    # and new path cost of current neighbour node is less than current path cost of neighbour node,
                     if newEnergyCost < budget and pathCost[neighbour] > newPathCost:
-                        # If new path cost of current neighbour node is less than current distance of neighbour node,
+                        
                         # add the neighbour node to the newNodeArr and push the current path into the min heap
-                            pathCost[neighbour] = newPathCost
-                            newNodeArr = nodeArr.copy()
-                            newNodeArr.append(neighbour)
-                            heappush(min_heap,(newPathCost,(newEnergyCost,newNodeArr)))
+                        pathCost[neighbour] = newPathCost
+                        newNodeArr = nodeArr.copy()
+                        newNodeArr.append(neighbour)
+                        heappush(min_heap,(newPathCost,(newEnergyCost,newNodeArr)))
 
     def aStarSearch (self,G,startingNode,endingNode,dist,cost,coord,budget):
         
         # We will be using a different data structure for the A star search, which is a priority queue
-        # The priority queue will be sorted by the total cost of the path, which is the distance + heuristic budget
+        # The priority queue will be sorted by the total cost of the path, which is the path cost + heuristic distance
         priorityQ = PriorityQueue()
 
         # Add starting node to min heap
@@ -239,7 +236,7 @@ class Solution :
                     newEnergyCost = currentEnergy + float(cost[currNeighbourStr])
 
                     # If current total energy cost is less than the budget,
-                    # and if new path cost of current neighbour node is less than current distance of neighbour node,
+                    # and if new path cost of current neighbour node is less than current path cost of neighbour node,
                     if pathCost[neighbour] > newPathCost and newEnergyCost < budget:
                         # we calculate the heuristic distance of the neighbour node and push the neighbour node into the priority queue
                         # We also update parent and pathCost
