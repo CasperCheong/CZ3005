@@ -50,7 +50,7 @@ class Helpers:
         return path
 
     # Print Path
-    def print_path(self,path): #Print sorted path
+    def print_path(self,path): 
         solution_str = "Shortest path: {}" .format(path[0])
         for i in range(1,len(path)):
             if path[i] is string :
@@ -68,7 +68,7 @@ class Helpers:
         print("Total Energy Cost:",totalEnergy)
         
     # Calculate total distance of the path
-    def calculateDistance(self,path,dist): #calculate PathCost
+    def calculateDistance(self,path,dist): 
         totalDistance = 0
         for i in range(1,(len(path))):
              if path[i] is string :
@@ -78,7 +78,7 @@ class Helpers:
         return totalDistance
 
     # Calculate total energy cost of the path
-    def calculateEnergyCost(self,path, cost): #Energy Cost
+    def calculateEnergyCost(self,path, cost): 
             totalEnergy = 0
             for i in range(1, (len(path))):
                 if path[i] is string :
@@ -261,29 +261,29 @@ helper = Helpers()
 
 
 print (" ============================ TASK 1 UCS Without Constraint =======================================")
-st = time.perf_counter()
+start = time.perf_counter()
 pr  =Sol.UCSWithoutConstraint(G,"1","50",Dist)
 end = time.perf_counter()
 path = helper.path_from_parents(pr,"1","50")
 helper.print_results(path,Cost,Dist)
-print("Time Taken: " , (end-st))
+print("Time Taken: " , (end-start))
 
 
 
 print (" ============================ TASK 2  UCS With Constraint =======================================")
-st = time.perf_counter()
+start = time.perf_counter()
 pr = Sol.UCSWithConstraint(G,"1","50",Cost,Dist,budget)
 helper.print_results(pr,Cost,Dist)
 end = time.perf_counter()
-print("Time Taken: " , (end-st))
+print("Time taken: " , (end-start))
 
 
 
 print (" ============================ TASK 3  A* Search W Budget =======================================")
-st = time.perf_counter()
+start = time.perf_counter()
 pr = Sol.aStarSearch(G,"1","50",Dist,Cost,Coord,budget)
 path = helper.path_from_parents(pr,"1","50")
 helper.print_results(path,Cost,Dist)
 end = time.perf_counter()
-print("Time Taken: " , (end-st))
+print("Time taken: " , (end-start))
 
