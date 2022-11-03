@@ -1,22 +1,50 @@
-male(charles) .
-male(andrew) . 
-male(edward) .
+/* predicates */
+male(prince_charles) .
+male(prince_andrew) . 
+male(prince_edward) .
 
-female(elizabeth) .
-female(ann) .
+female(queen_elizabeth) .
+female(princess_ann) .
 
-parent(elizabeth, charles) .
-parent(elizabeth, andrew) .
-parent(elizabeth, edward) .
-parent(elizabeth, ann) .
-
-son(charles, elizabeth) .
-son(andrew, elizabeth) .
-son(edward, elizabeth) .
-
-daughter(ann, elizabeth) .
+parent(queen_elizabeth, prince_charles) .
+parent(queen_elizabeth, prince_andrew) .
+parent(queen_elizabeth, prince_edward) .
+parent(queen_elizabeth, princess_ann) .
 
 
+older(prince_charles, princess_ann) .
+older(princess_ann, prince_andrew) .
+older(prince_andrew, prince_edward) .
 
-successor(X, Y) :- son(Y,X), parent(X, Y) .
-successor(X, Y) :- daughter(Y,X), parent(X, Y) . 
+/* rules */
+
+is_older(X, Y) :- older(X, Y) .
+is_older(X, Y) :- older(X, Z), is_older(Z, Y) .
+
+son(X, Y) :- parent(Y,X), male(X) .
+daughter(X, Y) :- parent(Y,X), female(X) .
+
+succession_rule(X,Y) :- parent(Z, X), parent(Z, Y), 
+                          male(X), female(Y),
+                          Y\=queen_elizabeth .
+                          
+succession_rule(X,Y) :- parent(Z, X), parent(Z, Y),
+                          male(X), male(Y), is_older(X, Y) .
+
+
+
+succession_rule(X,Y) :- parent(Z, X), parent(Z, Y),
+                          female(X), female(Y), is_older(X, Y),
+                          X \=queen_elizabeth, Y\=queen_elizabeth .
+
+
+%% Sorting algorithm
+succession_sort([A|B], Sorted) :- succession_sort(B, SortedTail), insert(A, SortedTail, Sorted).
+succession_sort([], []).
+
+insert(A, [B|C], [B|D]) :- not(succession_rule(A,B)), !, insert(A, C, D).
+insert(A, C, [A|C]).
+
+royalSuccessionList(X, SuccessionList):-
+	findall(Y, parent(X,Y), Children),
+	succession_sort(Children, SuccessionList).
