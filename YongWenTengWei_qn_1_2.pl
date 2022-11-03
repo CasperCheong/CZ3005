@@ -1,13 +1,14 @@
+/* predicates */
 company(sumsum) .
 company(appy) .
-
-business(galactica-s3) .
-
+competitor(sumsum,appy) .
+smartphonetechnology(galactica-s3) .
 boss(stevey, appy) .
 developed(sumsum, galactica-s3) .
-
 stolen(stevey, galactica-s3) .
 
-rival(sumsum, appy) .
-
-unethical(X) :- boss(X, appy), developed(Z, Y), stolen(X, Y), rival(Z,appy), business(Y) .
+/* rules */
+business(X) :- smartphonetechnology(X) .
+competitor(X, Y) :- competitor(Y, X) .
+rival(X, Y) :- competitor(X, Y) .
+unethical(X) :- boss(X, Y), stolen(X, Z), developed(W, Z), business(Z),company(W), rival(Y, W) .
