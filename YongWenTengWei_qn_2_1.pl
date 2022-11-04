@@ -6,10 +6,11 @@ male(prince_edward) .
 female(queen_elizabeth) .
 female(princess_ann) .
 
-parent(queen_elizabeth, prince_charles) .
-parent(queen_elizabeth, prince_andrew) .
-parent(queen_elizabeth, prince_edward) .
-parent(queen_elizabeth, princess_ann) .
+offspring(prince_charles, queen_elizabeth) .
+offspring(princess_ann, queen_elizabeth) .
+offspring(prince_andrew, queen_elizabeth) .
+offspring(prince_edward, queen_elizabeth) .
+
 
 
 older(prince_charles, princess_ann) .
@@ -21,21 +22,20 @@ older(prince_andrew, prince_edward) .
 is_older(X, Y) :- older(X, Y) .
 is_older(X, Y) :- older(X, Z), is_older(Z, Y) .
 
-son(X, Y) :- parent(Y,X), male(X) .
-daughter(X, Y) :- parent(Y,X), female(X) .
+%% Succession Rule 1: Male offspring will always precede female offspring
+succession_rule(X,Y) :- offspring(X, Z), offspring(Y, Z), 
+                        male(X), female(Y),
+                        Y\=queen_elizabeth .
 
-succession_rule(X,Y) :- parent(Z, X), parent(Z, Y), 
-                          male(X), female(Y),
-                          Y\=queen_elizabeth .
-                          
-succession_rule(X,Y) :- parent(Z, X), parent(Z, Y),
-                          male(X), male(Y), is_older(X, Y) .
-
+%% Succession Rule 2: The elder male offspring will always precede younger male offspring                         
+succession_rule(X,Y) :- offspring(X, Z), offspring(Y, Z),
+                        male(X), male(Y), is_older(X, Y) .
 
 
-succession_rule(X,Y) :- parent(Z, X), parent(Z, Y),
-                          female(X), female(Y), is_older(X, Y),
-                          X \=queen_elizabeth, Y\=queen_elizabeth .
+%% Succession Rule 3: The elder female offspring will always precede younger female offspring
+succession_rule(X,Y) :- offspring(X, Z), offspring(Y, Z),
+                        female(X), female(Y), is_older(X, Y),
+                        X\=queen_elizabeth, Y\=queen_elizabeth .
 
 
 %% Sorting algorithm
@@ -46,5 +46,5 @@ insert(A, [B|C], [B|D]) :- not(succession_rule(A,B)), !, insert(A, C, D).
 insert(A, C, [A|C]).
 
 royalSuccessionList(X, SuccessionList):-
-	findall(Y, parent(X,Y), Children),
+	findall(Y, offspring(Y, X), Children),
 	succession_sort(Children, SuccessionList).
