@@ -8,8 +8,8 @@ boss(stevey, appy) .
 stolen(stevey, galactica-s3) .
 
 /* rules */
-techDevelopedBy(X,Y) :- business(X), company(Y) .
+techDevelopedBy(X,Y) :- developed(Y,X), business(X), company(Y) .
 business(X) :- smartphoneTechnology(X) .
 competitor(X, Y) :- competitor(Y, X) .
 rival(X, Y) :- competitor(X, Y) .
-unethical(X) :- boss(X, Y), stolen(X, Z), developed(W,Z), techDevelopedBy(Z,W), rival(Y, W) .
+unethical(X) :- boss(X, Y), stolen(X, Z), techDevelopedBy(Z,W), rival(Y, W) .
