@@ -22,19 +22,19 @@ older(prince_andrew, prince_edward) .
 is_older(X, Y) :- older(X, Y) .
 is_older(X, Y) :- older(X, Z), is_older(Z, Y) .
 
+son(X,Y) :- offspring(X,Y), male(X) .
+daughter(X,Y) :- offspring(X,Y), female(X) .
+
 %% Succession Rule 1: Male offspring will always precede female offspring
-succession_rule(X,Y) :- offspring(X, Z), offspring(Y, Z), 
-                        male(X), female(Y),
+succession_rule(X,Y) :- son(X, Z), daughter(Y,Z),
                         Y\=queen_elizabeth .
 
 %% Succession Rule 2: The elder male offspring will always precede younger male offspring                         
-succession_rule(X,Y) :- offspring(X, Z), offspring(Y, Z),
-                        male(X), male(Y), is_older(X, Y) .
+succession_rule(X,Y) :- son(X, Z), son(Y, Z), is_older(X, Y) .
 
 
 %% Succession Rule 3: The elder female offspring will always precede younger female offspring
-succession_rule(X,Y) :- offspring(X, Z), offspring(Y, Z),
-                        female(X), female(Y), is_older(X, Y),
+succession_rule(X,Y) :- daughter(X, Z), daughter(Y, Z), is_older(X, Y),
                         X\=queen_elizabeth, Y\=queen_elizabeth .
 
 

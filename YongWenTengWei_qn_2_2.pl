@@ -21,6 +21,9 @@ older(prince_andrew, prince_edward) .
 is_older(X, Y) :- older(X, Y) .
 is_older(X, Y) :- older(X, Z), is_older(Z, Y) .
 
+son(X,Y) :- offspring(X,Y), male(X) .
+daughter(X,Y) :- offspring(X,Y), female(X) .
+
 %% Succession Rule 1: Elder offspring will always precede younger offspring, irregardless of gender
 succession_rule(X,Y) :- offspring(X, Z), offspring(Y, Z), 
                         is_older(X, Y),
