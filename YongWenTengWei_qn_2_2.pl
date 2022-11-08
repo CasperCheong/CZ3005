@@ -17,7 +17,6 @@ older(princess_ann, prince_andrew) .
 older(prince_andrew, prince_edward) .
 
 /* rules */
-
 is_older(X, Y) :- older(X, Y) .
 is_older(X, Y) :- older(X, Z), is_older(Z, Y) .
 
