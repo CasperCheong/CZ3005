@@ -11,5 +11,5 @@ stolen(stevey, galactica-s3) .
 tech_developed_by(X,Y) :- developed(Y,X), business(X), company(Y) .
 business(X) :- smart_phone_technology(X) .
 competitor(X, Y) :- competitor(Y, X) .
-rival(X, Y) :- competitor(X, Y) .
-unethical(X) :- boss(X, Y), stolen(X, Z), tech_developed_by(Z,W), rival(Y, W) .
+rival(X, appy) :- competitor(X, appy) .
+unethical(X) :- boss(X, Y), stolen(X, Z), tech_developed_by(Z,W), rival(W, Y) .
